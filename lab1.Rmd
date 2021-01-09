@@ -59,3 +59,42 @@ sf_trees_unite <- sf_trees %>%
   unite("id_status", tree_id:legal_status, sep = "_cool_")
 ```
 
+### make a map
+
+'st_as_sf()' to convert lat/long to spatial coord
+```{r}
+blackwood_acacia_sp <- blackwood_acacia %>% 
+  drop_na(longitude, latitude) %>% 
+  st_as_sf(coords = c("longitude", "latitude"))
+
+st_crs(blackwood_acacia_sp) = 4326
+
+ggplot(data = blackwood_acacia_sp) +
+  geom_sf(color = "darkgreen") +
+  theme_minimal()
+```
+
+### read in SF roads
+```{r}
+sf_map <- read_sf(here("data", "sf_map", "tl_2017_06075_roads.shp"))
+
+st_transform(sf_map, 4326)
+
+ggplot(data = sf_map) +
+  geom_sf()
+```
+
+combine sf map and trees
+```{r}
+ggplot() +
+  geom_sf(data = sf_map, size = 0.1, color = "darkgray") +
+  geom_sf(data = blackwood_acacia_sp, size = 0.5, color = "darkgreen")
+```
+
+```{r}
+tmap_mode("view")
+
+tm_shape(blackwood_acacia_sp) +
+  tm_dots()
+```
+
